@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 04: AWS IAM | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Security</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 04: AWS IAM</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 45 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: IAM, EC2</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>IAM is the central nervous system for cloud security. It handles Authentication (verifying identities) and Authorization (granting specific permissions). IAM strictly enforces the 'Principle of Least Privilege', ensuring that a user or application can only access the exact resources required to function.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>We use IAM Roles for our EC2 instances instead of hardcoding AWS Access Keys in our application code. When our FastAPI backend needs to read a file from S3, the boto3 SDK automatically assumes the IAM Role attached to the EC2 instance, retrieving temporary, auto-rotating security credentials.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph LR
+    EC2[EC2 Application Server] -->|Assumes| Role((IAM Role))
+    
+    subgraph Permissions [IAM Policies Attached]
+        Role -->|AmazonS3ReadOnly| S3[S3 Bucket Data]
+        Role -->|CloudWatchLogsFullAccess| CW[CloudWatch Log Streams]
+    end
+    
+    EC2 -.-x|Implicit Deny| RDS[(RDS Database Admin)]
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 4: Instance Profile IAM Role Assumption</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>IAM Roles vs. Hardcoded Access Keys: Using IAM Instance Profiles eliminates the catastrophic risk of leaking plain-text credentials inside application repository files. The trade-off is a steeper learning curve when configuring JSON permission boundaries and trust relationships.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod4-step0"> <span><strong>Root Account Lockdown:</strong> Secured the root account with a virtual Multi-Factor Authentication (MFA) device. The root account should never be used for daily administrative tasks.</span></label></li><li><label><input type="checkbox" id="mod4-step1"> <span><strong>IAM Groups:</strong> Created a `Backend-Devs` user group. In enterprise environments, attaching policies to groups instead of individual users prevents permission sprawl and simplifies onboarding.</span></label></li><li><label><input type="checkbox" id="mod4-step2"> <span><strong>Managed Policies:</strong> Attached the AWS-managed `AmazonEC2FullAccess` and `AmazonRDSReadOnlyAccess` policies to the group.</span></label></li><li><label><input type="checkbox" id="mod4-step3"> <span><strong>IAM Users:</strong> Provisioned console credentials for team members, placed them in the `Backend-Devs` group, and enforced a strict password policy (minimum length, requiring symbols/numbers).</span></label></li><li><label><input type="checkbox" id="mod4-step4"> <span><strong>IAM Roles for EC2:</strong> Created an IAM Role with a Trusted Entity Type of 'EC2'. This defines an Instance Profile.</span></label></li><li><label><input type="checkbox" id="mod4-step5"> <span><strong>Inline Policies:</strong> Attached a custom, inline JSON policy to the Role strictly limiting access to a single S3 bucket, preventing the EC2 instance from interacting with other team resources.</span></label></li><li><label><input type="checkbox" id="mod4-step6"> <span><strong>Role Assumption:</strong> Attached the IAM Role to the running EC2 instance via the AWS Console.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>This JSON policy demonstrates least privilege. Instead of granting 's3:*' across the whole account, it explicitly lists allowed actions and restricts them to a single bucket's Amazon Resource Name (ARN).</em></p>
+            <pre><code class="typewriter">{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::itm-lab-assets-12345",
+                "arn:aws:s3:::itm-lab-assets-12345/*"
+            ]
+        }
+    ]
+}</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: botocore.exceptions.ClientError: Access Denied.</strong><br>If your application code throws an Access Denied error when attempting to call AWS APIs, the IAM Role attached to the EC2 instance lacks the specific `Action` in its policy, or the specific `Resource` ARN is typed incorrectly. Verify the IAM Policy Simulator.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

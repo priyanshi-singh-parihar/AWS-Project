@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 03: Amazon VPC | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Networking</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 03: Amazon VPC</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 60 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: VPC, Subnets, IGW</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>VPC gives you complete control over your virtual networking environment. You define the logical network topology including IP address ranges (CIDR), subnets, route tables, and gateways. It ensures strict network isolation, preventing unauthorized external access to internal enterprise components.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>We implemented a classic Two-Tier Architecture. The Web Tier (EC2) sits in a Public Subnet with a direct route to the Internet Gateway. The Database Tier (RDS) sits in a Private Subnet with no public IP, meaning hackers cannot even attempt to scan or breach the database from the public internet.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph TD
+    Internet((Internet)) --> IGW[Internet Gateway]
+    IGW --> RouteTable[Public Route Table]
+    
+    subgraph VPC [VPC: 10.0.0.0/16]
+        RouteTable --> PubSub
+        
+        subgraph PubSub [Public Subnet: 10.0.1.0/24]
+            EC2[Web Server EC2]
+        end
+        
+        subgraph PrivSub [Private Subnet: 10.0.2.0/24]
+            RDS[(RDS PostgreSQL)]
+        end
+        
+        EC2 -->|Internal Traffic: Port 5432| RDS
+    end
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 3: Two-Tier VPC Isolation Architecture</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>Custom VPC Isolation vs. Default VPC Simplicity: Building a custom VPC with isolated private subnets provides maximum security and compliance. The trade-off is significantly higher networking configuration complexity (managing route tables, CIDR blocks, and gateway attachments).</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod3-step0"> <span><strong>VPC CIDR Allocation:</strong> Provisioned a custom VPC (`itm-production-vpc`) with an IPv4 CIDR block of `10.0.0.0/16`, yielding 65,536 private IP addresses.</span></label></li><li><label><input type="checkbox" id="mod3-step1"> <span><strong>Public Subnet Design:</strong> Created `Subnet-Public-1a` (`10.0.1.0/24`) in the `ap-south-1a` Availability Zone. Configured the subnet settings to 'Auto-assign public IPv4 address' for any launched EC2 instances.</span></label></li><li><label><input type="checkbox" id="mod3-step2"> <span><strong>Private Subnet Design:</strong> Created `Subnet-Private-1a` (`10.0.2.0/24`) in the same AZ. Crucially, left public IP auto-assignment disabled.</span></label></li><li><label><input type="checkbox" id="mod3-step3"> <span><strong>Internet Gateway (IGW):</strong> Created an IGW and attached it to our VPC. A VPC can only have one IGW attached at a time.</span></label></li><li><label><input type="checkbox" id="mod3-step4"> <span><strong>Public Route Table:</strong> Created a custom Route Table, added a route mapping Destination `0.0.0.0/0` (all internet traffic) to the Target `igw-xxxx`, and explicitly associated it with the Public Subnet.</span></label></li><li><label><input type="checkbox" id="mod3-step5"> <span><strong>Private Route Table:</strong> Maintained the main Route Table for the Private Subnet, which only contains the `10.0.0.0/16` local route, explicitly preventing outbound internet access.</span></label></li><li><label><input type="checkbox" id="mod3-step6"> <span><strong>NAT Gateway (Theory):</strong> Explored NAT Gateways, which would allow our private database to download software updates from the internet without exposing itself to incoming connections.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>When automating network infrastructure, engineers use the AWS CLI or Terraform. Here is the raw CLI execution to create a VPC, an IGW, and attach them together.</em></p>
+            <pre><code class="typewriter"># Step 1: Create the VPC and capture the output VpcId
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+
+# Step 2: Create the Internet Gateway
+aws ec2 create-internet-gateway
+
+# Step 3: Attach the IGW to the VPC
+aws ec2 attach-internet-gateway \
+    --vpc-id vpc-0a1b2c3d4e5f6g7h8 \
+    --internet-gateway-id igw-0123456789abcdef0</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: EC2 instance in a custom VPC cannot be reached via SSH.</strong><br>Check the triad of public networking: 1) Does the instance have a Public IP? 2) Is the IGW firmly attached to the VPC? 3) Does the Route Table associated with that specific subnet have a <code>0.0.0.0/0</code> route pointing to the IGW?</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

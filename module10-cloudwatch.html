@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 10: Amazon CloudWatch | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Monitoring</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 10: Amazon CloudWatch</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 45 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: CloudWatch, SNS, EC2</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>CloudWatch is the centralized observability hub for AWS. It aggregates metrics, logs, and events across your infrastructure. In production, proactive monitoring is non-negotiable; you must configure automated alarms to detect memory leaks, disk space exhaustion, or CPU spikes before they cascade into system outages.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>CloudWatch monitors the vital signs of our entire architecture. It tracks ALB request counts, EC2 CPU utilization (feeding data to our Auto Scaling Group), and RDS connection limits. We also stream application error logs directly to CloudWatch Logs so we can debug Python exceptions without SSHing into multiple servers.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph LR
+    EC2[EC2 Instance] -->|Pushes OS Metrics| CW((Amazon CloudWatch))
+    
+    CW -->|Metric: CPU > 85%| Alarm[CloudWatch Alarm]
+    Alarm -->|Triggers| SNS[SNS Topic: DevOps-Alerts]
+    SNS -->|Sends Email| Admin((DevOps Engineer))
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 10: Infrastructure Monitoring and Alerting Pipeline</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>CloudWatch Observability vs. Data Ingestion Costs: Centralized metrics and log streaming provide instant visibility and proactive alerting. However, storing large volumes of custom log streams and high-resolution metrics past the free tier allowance incurs recurring ingestion and storage fees.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod10-step0"> <span><strong>Metrics Exploration:</strong> Navigated to CloudWatch Metrics. Explored the `AWS/EC2` namespace to view standard hypervisor metrics like `CPUUtilization`, `NetworkIn`, and `DiskReadOps`.</span></label></li><li><label><input type="checkbox" id="mod10-step1"> <span><strong>Custom Dashboards:</strong> Built a unified CloudWatch Dashboard featuring line charts for CPU usage and number widgets for active Database Connections.</span></label></li><li><label><input type="checkbox" id="mod10-step2"> <span><strong>SNS Topic Creation:</strong> Navigated to Simple Notification Service (SNS). Created a Standard Topic named `DevOps-Alert-Channel` and subscribed our engineering email addresses, confirming the subscription via inbox.</span></label></li><li><label><input type="checkbox" id="mod10-step3"> <span><strong>Metric Alarms:</strong> Created an alarm for EC2 CPU Utilization. Set the static threshold to 'Greater/Equal to 85%' for 2 consecutive evaluation periods of 5 minutes.</span></label></li><li><label><input type="checkbox" id="mod10-step4"> <span><strong>Alarm Actions:</strong> Configured the alarm to trigger the `DevOps-Alert-Channel` SNS topic when in the 'ALARM' state.</span></label></li><li><label><input type="checkbox" id="mod10-step5"> <span><strong>CloudWatch Agent Setup:</strong> Connected to the EC2 instance and installed the CloudWatch Unified Agent. By default, AWS cannot see inside your OS. The agent pushes internal metrics (like RAM usage and Disk Space percent) to custom CloudWatch namespaces.</span></label></li><li><label><input type="checkbox" id="mod10-step6"> <span><strong>Log Streaming:</strong> Configured the agent's JSON file to stream `/var/log/nginx/error.log` into CloudWatch Log Groups, enabling centralized log querying.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>To verify that our CloudWatch Alarms and Auto Scaling tracking policies work, we install a stress-testing utility via the terminal to artificially peg the CPU at 100%.</em></p>
+            <pre><code class="typewriter"># Step 1: SSH into the EC2 instance and install stress-ng
+sudo apt-get install stress-ng -y
+
+# Step 2: Launch a CPU stress test utilizing 100% of all CPU cores for 10 minutes
+sudo stress-ng --cpu $(nproc) --timeout 10m --metrics-brief
+
+# Step 3: Monitor the CloudWatch Metrics graph. 
+# The SNS email alert should trigger, followed by the ASG launching new instances.</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: Custom Memory/RAM metrics are not appearing in CloudWatch.</strong><br>If you installed the CloudWatch Agent but no data is appearing, it is an IAM permissions issue. The EC2 instance must have an IAM Role attached that includes the <code>CloudWatchAgentServerPolicy</code>. Without this policy, the agent runs locally but its API calls to push data to AWS are denied.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

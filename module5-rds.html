@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 05: Amazon RDS | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Database</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 05: Amazon RDS</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 50 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: RDS, PostgreSQL, VPC</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>RDS removes the operational burden of managing relational databases. It abstracts away OS patching, database engine updates, automated daily snapshots, and complex master-standby replication setups. Engineers can deploy MySQL, PostgreSQL, or Aurora with high availability in a few clicks.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>We deployed a PostgreSQL RDS instance into the Private Subnets of our VPC. The database handles all ACID-compliant transactional data. It is completely isolated from the internet; its Security Group only permits inbound port 5432 connections originating from the EC2 Web Server's Security Group.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph TD
+    EC2[EC2 Web Server] -->|SG restricted: 5432| Primary
+    
+    subgraph VPC [Custom VPC: Private Subnets]
+        subgraph DB Subnet Group
+            Primary[(RDS PostgreSQL Primary<br>ap-south-1a)]
+            Standby[(RDS PostgreSQL Standby<br>ap-south-1b)]
+        end
+        Primary -.->|Synchronous Replication| Standby
+    end
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 5: Multi-AZ RDS Deployment Topology</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>Managed RDS vs. Self-Hosted DB on EC2: RDS automates high availability failover, OS patches, and daily backups, saving hundreds of hours of DevOps labor. However, it is more expensive than running PostgreSQL directly on an EC2 instance and abstracts away low-level filesystem kernel tuning access.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod5-step0"> <span><strong>DB Subnet Group:</strong> Created a DB Subnet Group spanning our private subnets (`ap-south-1a` and `ap-south-1b`). RDS requires at least two Availability Zones even for single-AZ deployments.</span></label></li><li><label><input type="checkbox" id="mod5-step1"> <span><strong>Engine Selection:</strong> Selected the open-source PostgreSQL engine (version 15) using the 'Standard Create' interface.</span></label></li><li><label><input type="checkbox" id="mod5-step2"> <span><strong>Instance Sizing:</strong> Configured the DB instance class to `db.t3.micro` and allocated 20 GB of General Purpose SSD (gp2) storage. Disabled storage autoscaling.</span></label></li><li><label><input type="checkbox" id="mod5-step3"> <span><strong>Authentication:</strong> Established the master username (`postgres_admin`) and a secure password. Explored the option of IAM Database Authentication for passwordless, token-based logins.</span></label></li><li><label><input type="checkbox" id="mod5-step4"> <span><strong>Network Security:</strong> Placed the instance in our custom VPC. Selected 'No' for Public Access to prevent the database from getting a public IP.</span></label></li><li><label><input type="checkbox" id="mod5-step5"> <span><strong>Security Group Rules:</strong> Created an RDS Security Group. Set an Inbound Rule for PostgreSQL (5432) where the Source is the *ID of the EC2 Security Group* (e.g., `sg-0abcd1234`), rather than a static IP.</span></label></li><li><label><input type="checkbox" id="mod5-step6"> <span><strong>Automated Backups:</strong> Configured a 7-day retention period for automated backups, allowing point-in-time recovery down to the exact second.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>Once the database is up, you must connect via an EC2 instance in the same VPC (acting as a Bastion Host) to initialize the schema and run migrations.</em></p>
+            <pre><code class="typewriter"># Step 1: Install PostgreSQL client tools on the EC2 web server
+sudo apt-get install postgresql-client -y
+
+# Step 2: Connect using the internal DNS writer endpoint provided by RDS
+psql --host=itm-db-1.c3x...ap-south-1.rds.amazonaws.com \
+     --port=5432 \
+     --username=postgres_admin \
+     --dbname=postgres</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: psql command times out indefinitely without a password prompt.</strong><br>This is a classic Security Group configuration failure. The database is actively dropping your packets. Go to the RDS Security Group's Inbound Rules and ensure the Source field strictly references the Security Group ID of the connecting EC2 instance.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

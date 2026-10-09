@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 06: AWS Lambda | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Serverless</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 06: AWS Lambda</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 40 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: Lambda, S3, IAM</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>Lambda is an event-driven, serverless compute service. You provide the code, and AWS provisions the execution environment on the fly. It scales automatically from zero to thousands of concurrent executions. You pay only for the exact milliseconds your code executes, making it incredibly cost-effective for spiky workloads.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>Lambda handles our asynchronous background tasks. When a student uploads a large PDF report to S3, S3 triggers a Lambda function. The function processes the PDF, extracts metadata, and updates a DynamoDB table. This totally offloads heavy processing from our main EC2 web server.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph LR
+    User((User)) -->|Uploads File| S3[Amazon S3 Bucket]
+    S3 -->|s3:ObjectCreated Event| Lambda((AWS Lambda))
+    
+    subgraph Serverless Execution
+        Lambda -->|Python 3.11 logic| Code[Data Processing]
+    end
+    
+    Code -->|Store Metadata| DDB[(DynamoDB Table)]
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 6: Event-Driven S3 to Lambda Trigger Pipeline</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>Serverless Lambda vs. EC2 Worker Queues: Lambda scales instantly to zero cost when idle and requires zero server management. The trade-off is execution time limits (max 15 minutes), potential cold-start latency spikes, and lack of persistent local disk state between invocations.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod6-step0"> <span><strong>Function Creation:</strong> Navigated to Lambda, selected 'Author from scratch', named the function `ProcessUploadedPDF`, and selected the `Python 3.11` runtime.</span></label></li><li><label><input type="checkbox" id="mod6-step1"> <span><strong>Execution Context:</strong> Examined the concept of 'Cold Starts' (the initial latency when AWS spins up the micro-VM) vs 'Warm Starts' (when subsequent events reuse the active environment).</span></label></li><li><label><input type="checkbox" id="mod6-step2"> <span><strong>Execution Role:</strong> Modified the auto-generated IAM Execution Role to include `AmazonS3ReadOnlyAccess` and `AmazonDynamoDBFullAccess`.</span></label></li><li><label><input type="checkbox" id="mod6-step3"> <span><strong>S3 Event Trigger:</strong> Configured an S3 trigger on our asset bucket. Set the Event Type to `s3:ObjectCreated:*` with a suffix filter of `.pdf` to prevent the function from triggering on image uploads.</span></label></li><li><label><input type="checkbox" id="mod6-step4"> <span><strong>Code Deployment:</strong> Wrote Python code using the `boto3` SDK to parse the incoming event JSON payload and extract the bucket name and object key.</span></label></li><li><label><input type="checkbox" id="mod6-step5"> <span><strong>Timeout Configuration:</strong> Increased the default 3-second timeout to 1 minute, accounting for the time it takes to parse large PDF files.</span></label></li><li><label><input type="checkbox" id="mod6-step6"> <span><strong>Lambda Layers:</strong> Explored Lambda Layers as a method to upload external libraries (like `PyPDF2` or `Pillow`) without bloating the main function deployment package.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>The `lambda_handler` is the entry point. AWS passes a massive JSON dictionary called `event` which contains all the metadata about the action that triggered the function.</em></p>
+            <pre><code class="typewriter">import json
+import urllib.parse
+import boto3
+
+def lambda_handler(event, context):
+    # Digging into the nested JSON to extract the S3 Bucket and File Key
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
+    
+    print(f"Trigger received! Processing file: {key} from {bucket}")
+    
+    # Execution logic here...
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Background job completed successfully.')
+    }</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: Task timed out after 3.00 seconds.</strong><br>If your CloudWatch logs show this error, your function ran out of time before completing its execution. Either your code is stuck in an infinite loop, an external API is responding slowly, or you simply need to go to Configuration > General configuration and increase the Timeout value.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

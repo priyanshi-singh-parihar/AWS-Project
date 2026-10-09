@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Lab Documentation | ITM Gwalior</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="hero">
+            <h1>AWS Cloud Training Labs</h1>
+            <p>Comprehensive technical documentation of our 10-module cloud infrastructure deployment.</p>
+        </header>
+        
+        </div>
+        <section id="team">
+            <h2 class="section-title">Project Team</h2>
+            <div class="team-grid">
+                <div class="profile-card">
+                    <h3>Priyanshi Singh Parihar</h3>
+                    <div class="profile-meta">3rd Year B.Tech CSE (5th Sem) • ITM Gwalior<br>Enrollment: 0905CS241208</div>
+                    <div class="profile-links">
+                        <a href="mailto:priyanshisinghparihar01@gmail.com">Email</a>
+                        <a href="https://www.linkedin.com/in/priyanshi-singh-parihar?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">LinkedIn</a>
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <h3>Mudita Jain</h3>
+                    <div class="profile-meta">3rd Year B.Tech CSE (5th Sem) • ITM Gwalior</div>
+                    <div class="profile-links">
+                        <a href="mailto:muditajain616@gmail.com">Email</a>
+                        <a href="http://www.linkedin.com/in/" target="_blank">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="modules">
+            <h2 class="section-title">Deep-Dive Training Modules</h2>
+            <div class="modules-grid">
+                <a href="module1-ec2.html" class="module-card"><span class="module-tag">01. Compute</span><h4>Amazon EC2</h4><p>SSH key pairs, Security Groups, User Data, and Instance lifecycles.</p></a>
+                <a href="module2-s3.html" class="module-card"><span class="module-tag">02. Storage</span><h4>Amazon S3</h4><p>Bucket policies, Block Public Access (BPA), and static web hosting.</p></a>
+                <a href="module3-vpc.html" class="module-card"><span class="module-tag">03. Networking</span><h4>Amazon VPC</h4><p>CIDR blocks, public/private subnets, Route Tables, and IGWs.</p></a>
+                <a href="module4-iam.html" class="module-card"><span class="module-tag">04. Security</span><h4>AWS IAM</h4><p>Role-based access control, inline JSON policies, and instance profiles.</p></a>
+                <a href="module5-rds.html" class="module-card"><span class="module-tag">05. Database</span><h4>Amazon RDS</h4><p>Multi-AZ deployments, DB Subnet Groups, and PostgreSQL engines.</p></a>
+                <a href="module6-lambda.html" class="module-card"><span class="module-tag">06. Serverless</span><h4>AWS Lambda</h4><p>Event-driven Python execution, S3 triggers, and runtime timeouts.</p></a>
+                <a href="module7-route53.html" class="module-card"><span class="module-tag">07. DNS</span><h4>Amazon Route 53</h4><p>Hosted Zones, A/CNAME records, and active-passive failover routing.</p></a>
+                <a href="module8-elb.html" class="module-card"><span class="module-tag">08. Traffic</span><h4>Elastic Load Balancing</h4><p>Application Load Balancers (ALB), listeners, and Target Groups.</p></a>
+                <a href="module9-autoscaling.html" class="module-card"><span class="module-tag">09. Scaling</span><h4>Auto Scaling</h4><p>Launch Templates, Target Tracking Policies, and cooldown timers.</p></a>
+                <a href="module10-cloudwatch.html" class="module-card"><span class="module-tag">10. Monitoring</span><h4>Amazon CloudWatch</h4><p>Custom metric dashboards, SNS alarm thresholds, and log streaming.</p></a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+</body>
+</html>

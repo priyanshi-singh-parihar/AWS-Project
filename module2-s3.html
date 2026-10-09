@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 02: Amazon S3 | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Storage</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 02: Amazon S3</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 30 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: S3, IAM</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>S3 is a highly durable, infinitely scalable object storage service. Unlike block storage (EBS) which must be attached to a single EC2 instance, S3 stores data as 'objects' accessible via HTTP APIs. It provides 99.999999999% (11 9's) of data durability across multiple availability zones.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>S3 decouples our static asset delivery from our backend compute. Instead of serving heavy PDF documents and user profile pictures from our EC2 instance (which wastes CPU and bandwidth), S3 handles all static file delivery directly to the end users.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph LR
+    User((End User)) -->|GET Request| S3Endpoint[S3 Website Endpoint]
+    
+    subgraph S3 [Amazon S3: itm-lab-assets]
+        BPA[Block Public Access: OFF]
+        Policy[JSON Bucket Policy: s3:GetObject]
+        HTML[index.html]
+        CSS[style.css]
+        
+        BPA -.-> Policy
+        Policy --> HTML
+        Policy --> CSS
+    end
+    
+    Dev((Developer)) -->|AWS CLI Sync| S3
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 2: S3 Public Static Web Hosting Flow</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>S3 Static Hosting vs. Server-Rendered Storage: S3 provides 11 nines of durability and instant global scaling without managing server disks. However, it is strictly limited to static file distribution and cannot execute server-side application logic or dynamic runtime rendering natively.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod2-step0"> <span><strong>Global Bucket Creation:</strong> Created a bucket named `itm-lab-assets-[id]`. Bucket names share a single global namespace across all AWS regions and accounts.</span></label></li><li><label><input type="checkbox" id="mod2-step1"> <span><strong>Storage Class Selection:</strong> Kept the default 'S3 Standard' storage class for frequent access, analyzing options like 'S3 Standard-IA' for older exam records, or 'Glacier Deep Archive' for compliance retention.</span></label></li><li><label><input type="checkbox" id="mod2-step2"> <span><strong>Versioning Enablement:</strong> Turned on Bucket Versioning. This ensures that if a user uploads a file with the same name, the old file isn't overwritten, protecting against accidental deletions or application bugs.</span></label></li><li><label><input type="checkbox" id="mod2-step3"> <span><strong>Public Access Block (BPA):</strong> Disabled the 'Block all public access' setting. While dangerous for private buckets, disabling BPA is mandatory to serve public website assets.</span></label></li><li><label><input type="checkbox" id="mod2-step4"> <span><strong>Static Website Hosting:</strong> Enabled the Static Website Hosting feature, routing the root endpoint to `index.html` and setting an `error.html` page for clean 404 handling.</span></label></li><li><label><input type="checkbox" id="mod2-step5"> <span><strong>CORS Configuration:</strong> Added a Cross-Origin Resource Sharing (CORS) policy to allow our frontend application (hosted on a different domain) to request fonts and images from the S3 bucket without browser blocks.</span></label></li><li><label><input type="checkbox" id="mod2-step6"> <span><strong>Bucket Policy:</strong> Wrote a custom JSON resource policy to grant public read access (`s3:GetObject`) to all objects within the bucket.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>The Bucket Policy is the critical security boundary. This policy explicitly allows any anonymous user on the internet to read files from the bucket, but denies any write or delete actions.</em></p>
+            <pre><code class="typewriter">{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::itm-lab-assets-12345/*"
+        }
+    ]
+}</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: 403 Access Denied on Static Endpoint.</strong><br>Even if BPA is disabled, AWS implicitly denies read requests. If your website shows an XML 403 error, verify your JSON Bucket Policy. Ensure the <code>Resource</code> ARN ends with <code>/*</code> to apply to the objects *inside* the bucket, not just the bucket itself.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

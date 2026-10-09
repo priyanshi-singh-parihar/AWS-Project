@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Linux & Cloud Shell Masterclass | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">System Foundation</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Complete Linux & Cloud Shell Masterclass</h1>
+            <p style="font-family: var(--terminal-font); margin-top: 10px; color: var(--text-muted);">An exhaustive reference from basic navigation to advanced server diagnostics, network routing, storage partitioning, and deployment automation.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>1. Basic File System Navigation & Directory Management</h3>
+            <p>Mastering core directory movements, viewing hidden files, creating directory structures, and safe file management.</p>
+            <pre><code class="typewriter"># Print current working directory path
+pwd
+
+# List files and directories with long format, hidden files, and human-readable sizes
+ls -la /var/www/html
+
+# Change directories and move up one level
+cd /etc/nginx
+cd ..
+
+# Create nested directories safely (no errors if it already exists)
+mkdir -p /var/www/html/app/logs
+
+# Create placeholder files or update modification timestamps
+touch app.config
+
+# Copy, move, and remove files (always use -i for prompt before overwrite in prod)
+cp config.env config.env.bak
+mv config.env.bak /tmp/
+rm -f /tmp/config.env.bak</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>2. Text Searching, Parsing & Inspection</h3>
+            <p>Filtering strings, finding patterns inside large codebases, viewing file heads/tails, and piping text utilities.</p>
+            <pre><code class="typewriter"># Search recursively for a string/keyword across an entire codebase
+grep -rnw '/opt/backend/' -e 'DATABASE_URL'
+
+# View file heads and tails for log spot-checks
+head -n 25 /var/log/syslog
+tail -n 100 /var/log/nginx/error.log
+
+# Combine and page through large text documents (use SPACE to scroll, Q to quit)
+less /var/log/cloud-init-output.log
+
+# Find files across the entire filesystem by name (ignoring permission denied errors)
+find / -name "*.pem" 2>/dev/null</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>3. Advanced Permissions, Ownership & Sudo Controls</h3>
+            <p>Securing sensitive cloud keys and mapping file execution rights to specific server daemons to prevent privilege escalation attacks.</p>
+            <pre><code class="typewriter"># Lock down SSH private keys so ssh client accepts them (Read by owner only)
+chmod 400 itm-lab-key.pem
+
+# Recursively assign ownership to the Nginx web server user
+sudo chown -R www-data:www-data /var/www/html/app
+
+# Grant execute permissions to custom deployment scripts
+chmod +x deploy.sh
+
+# Modify sudoers security configuration safely (validates syntax before saving)
+sudo visudo</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>4. Disk Storage, Partitioning & Block Devices</h3>
+            <p>Diagnosing disk exhaustion bottlenecks, mapping attached EBS block storage volumes, and tracking file node allocations.</p>
+            <pre><code class="typewriter"># Report filesystem disk space usage in human-readable format
+df -h
+
+# Estimate file space usage recursively to find large log bottlenecks
+du -sh /var/log/* | sort -hr
+
+# Inspect block devices and disk partitions attached to the EC2 instance
+lsblk
+
+# Check inode usage (running out of inodes crashes file creation even with free disk space)
+df -i</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>5. Process Management, Daemons & Resource Monitoring</h3>
+            <p>Tracking CPU/RAM consumption, managing background tasks, and controlling runaway executions safely.</p>
+            <pre><code class="typewriter"># Display active running processes filtered by service name
+ps aux | grep python3
+
+# Interactive real-time process performance managers
+top
+htop
+
+# Gracefully terminate vs forcefully kill a runaway process
+kill -15 4521   # SIGTERM (Graceful exit)
+kill -9 4521    # SIGKILL (Force shut down)
+
+# Run server processes persistently in background surviving terminal logouts
+nohup python3 main.py > app.log 2>&1 &</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>6. Network Routing, Ports & Diagnostics</h3>
+            <p>Troubleshooting VPC security group reachability, analyzing active socket bindings, and testing external connectivity.</p>
+            <pre><code class="typewriter"># Inspect active listening ports and bound socket protocols (modern replacement for netstat)
+sudo ss -tulpn | grep LISTEN
+
+# Test web server connectivity and headers locally
+curl -I http://localhost:8000/health
+
+# Trace packet routing hops to database endpoints
+traceroute database-1.c3x.ap-south-1.rds.amazonaws.com
+
+# Query EC2 Instance Metadata service v2 (IMDSv2) token securely
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>7. Log Parsing, AWK Pipelines & Sed Transformations</h3>
+            <p>Extracting metrics from raw log streams and automating text replacement inside application configuration files.</p>
+            <pre><code class="typewriter"># Stream error logs in real-time with color highlighting for the word "error"
+sudo tail -f /var/log/nginx/error.log | grep --color=auto "error"
+
+# Count top 10 unique visitor IP addresses from Nginx access logs using awk
+awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -n 10
+
+# Perform inline search and replace across config files
+sed -i 's/HOST=localhost/HOST=0.0.0.0/g' .env</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>8. Systemd Daemons & Service Control</h3>
+            <p>Managing the operational lifecycle of installed services, configuring auto-restarts, and investigating boot logs.</p>
+            <pre><code class="typewriter"># Check detailed runtime status of a service daemon
+sudo systemctl status nginx.service
+
+# Restart or reload configuration without dropping active connections
+sudo systemctl restart nginx.service
+sudo systemctl reload nginx.service
+
+# Enable a service to start on system boot automatically
+sudo systemctl enable fastapi.service
+
+# View structured journalctl system logs filtered by service since 1 hour ago
+sudo journalctl -u nginx.service --since "1 hour ago" --no-pager</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>9. Package Management & Archiving Utilities</h3>
+            <p>Maintaining software libraries via apt, isolating Python virtual environments, and bundling directories into compressed backups.</p>
+            <pre><code class="typewriter"># Update repository database and upgrade system packages
+sudo apt-get update -y && sudo apt-get upgrade -y
+
+# Compress a directory into a tar.gz archive for backup
+tar -czvf app-backup.tar.gz /var/www/html/app
+
+# Extract a tar.gz archive to a specific target directory
+tar -xzvf app-backup.tar.gz -C /tmp/
+
+# Create a zip archive and unzip it
+zip -r archive.zip /opt/backend/
+unzip archive.zip -d /var/www/</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h3>10. Enterprise Bash Scripting for Cloud Bootstrapping</h3>
+            <p>Production-grade Bash automation scripts injected into EC2 User Data or Auto Scaling Launch Templates to configure fresh nodes instantly on boot.</p>
+            <pre><code class="typewriter">#!/bin/bash
+set -e
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[1/4] Updating system packages and installing runtimes..."
+apt-get update -y && apt-get upgrade -y
+apt-get install -y python3-pip python3-venv nginx git curl
+
+echo "[2/4] Cloning repository and setting up virtual environment..."
+git clone https://github.com/itm-project/backend.git /var/www/html/app
+cd /var/www/html/app
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+echo "[3/4] Setting proper file permissions..."
+chown -R www-data:www-data /var/www/html/app
+
+echo "[4/4] Enabling web services..."
+systemctl enable nginx
+systemctl restart nginx
+echo "Cloud node bootstrap completed successfully!"</code></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+</body>
+</html>

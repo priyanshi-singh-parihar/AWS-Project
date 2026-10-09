@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 07: Amazon Route 53 | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">DNS</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 07: Amazon Route 53</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 30 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: Route 53, S3, EC2</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>Route 53 is a highly available, globally distributed Domain Name System (DNS) web service. It acts as the internet's phonebook, translating domain names (e.g., `itm.edu`) into numeric IP addresses. It also provides advanced traffic flow rules like weighted routing, latency-based routing, and active health checks.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>Route 53 is the entry point for all user traffic. Instead of giving users an ugly Load Balancer URL, we map a custom domain. By configuring an Active-Passive Failover policy, Route 53 continuously monitors our EC2 servers. If they crash, DNS automatically flips and routes users to a static 'Under Maintenance' page on S3.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph TD
+    Client((Client Browser)) --> DNS((Route 53))
+    
+    DNS -->|Primary A Record| EC2[EC2 Production Server]
+    DNS -.->|Secondary Failover Record| S3[S3 Static Maintenance Page]
+    
+    HC((Route 53 Health Check)) -->|Pings /health| EC2
+    HC -.->|On Failure| DNS
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 7: Route 53 Active-Passive Failover Routing</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>Route 53 Managed DNS vs. Registrar DNS: Leveraging Route 53 allows high-speed Anycast DNS routing and instant integration with AWS health checks and ALBs. The trade-off is a minor monthly hosted zone fee and managing name server delegations outside your registrar.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod7-step0"> <span><strong>Hosted Zone Setup:</strong> Created a 'Public Hosted Zone' for our custom domain. Copied the four generated Name Servers (NS records) and updated our domain registrar's DNS settings to delegate routing authority to AWS.</span></label></li><li><label><input type="checkbox" id="mod7-step1"> <span><strong>A Records:</strong> Created an `A Record` (Address Record) mapping our apex domain to the specific Elastic IP address of our web server.</span></label></li><li><label><input type="checkbox" id="mod7-step2"> <span><strong>ALIAS Records:</strong> Created a subdomain (`api.example.com`) using an ALIAS record. ALIAS is an AWS-specific feature that allows you to map a domain directly to an AWS resource ARN (like a Load Balancer) without incurring DNS query charges.</span></label></li><li><label><input type="checkbox" id="mod7-step3"> <span><strong>Health Checks:</strong> Created a Route 53 Health Check pointing to our EC2 instance's `/health` HTTP endpoint, pinging it every 30 seconds from multiple global AWS locations.</span></label></li><li><label><input type="checkbox" id="mod7-step4"> <span><strong>Routing Policies:</strong> Changed the A Record's routing policy from 'Simple' to 'Failover'. Set the EC2 instance as the 'Primary' record tied to the Health Check.</span></label></li><li><label><input type="checkbox" id="mod7-step5"> <span><strong>Failover Target:</strong> Created a secondary 'Failover' record pointing to a static S3 bucket configured for web hosting.</span></label></li><li><label><input type="checkbox" id="mod7-step6"> <span><strong>TTL Tuning:</strong> Lowered the Time-To-Live (TTL) value to 60 seconds during testing to ensure DNS changes propagated quickly to local ISP caches.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>DNS propagation can take time. Developers use the `dig` command-line utility to query DNS records directly from nameservers, bypassing local machine caching.</em></p>
+            <pre><code class="typewriter"># Query local ISP to see what IP the domain currently resolves to
+dig +short example.com
+
+# Query the specific AWS Route 53 nameserver directly to verify our changes
+dig @ns-123.awsdns-45.com example.com A
+
+# Check the CNAME or ALIAS records for a subdomain
+dig +short api.example.com CNAME</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: Site cannot be reached (DNS_PROBE_FINISHED_NXDOMAIN).</strong><br>If your browser throws an NXDOMAIN error immediately after setup, your domain registrar is likely still pointing to its default parked nameservers. You must replace them with the four specific NS records generated by your Route 53 Hosted Zone. Full propagation can take up to 24-48 hours.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 08: Elastic Load Balancing | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Traffic</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 08: Elastic Load Balancing</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 45 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: ALB, Target Groups, EC2</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>Elastic Load Balancing evenly distributes incoming network traffic across a fleet of targets (EC2 instances, containers, or IP addresses). It increases application availability and fault tolerance. Application Load Balancers (ALB) operate at Layer 7 (HTTP/HTTPS), allowing advanced path-based routing and SSL termination.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>Users hit the ALB, not the EC2 instances. The ALB holds our SSL certificate (HTTPS), decrypts the secure traffic, inspects the URL path, and forwards plain HTTP traffic to our internal EC2 instances. This shields our servers from direct internet exposure and centralizes our encryption management.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph TD
+    User((User Traffic)) --> ALB((Application Load Balancer))
+    
+    ALB -->|Listener: Port 80| TG[Target Group: Backend APIs]
+    
+    subgraph Availability Zones
+        TG --> EC2_A[EC2 Instance A: ap-south-1a]
+        TG --> EC2_B[EC2 Instance B: ap-south-1b]
+    end
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 8: ALB Traffic Distribution across Availability Zones</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>ALB Protection vs. Direct EC2 Access: Using an Application Load Balancer provides automatic SSL encryption, health checks, and shields backend servers from direct cyber-attacks. The trade-off is a small fixed hourly infrastructure cost and milliseconds of extra network latency.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod8-step0"> <span><strong>Target Group Creation:</strong> Created a Target Group for 'Instances'. Configured the protocol to HTTP on Port 80. Defined the Health Check path as `/api/health`. Registered our running EC2 instances into the group.</span></label></li><li><label><input type="checkbox" id="mod8-step1"> <span><strong>ALB Provisioning:</strong> Selected 'Application Load Balancer' because our application relies on HTTP header inspection. (Network Load Balancers operate at Layer 4 for extreme TCP performance).</span></label></li><li><label><input type="checkbox" id="mod8-step2"> <span><strong>Subnet Mapping:</strong> Mapped the ALB to our VPC and explicitly selected two Public Subnets across two Availability Zones for redundancy.</span></label></li><li><label><input type="checkbox" id="mod8-step3"> <span><strong>Security Groups:</strong> Created an ALB Security Group allowing inbound Port 80 and 443 from the internet (0.0.0.0/0).</span></label></li><li><label><input type="checkbox" id="mod8-step4"> <span><strong>EC2 Security Lockdown:</strong> Modified the backend EC2 Security Group. Removed the 0.0.0.0/0 rule for Port 80 and replaced it with the ALB's Security Group ID, ensuring users cannot bypass the load balancer.</span></label></li><li><label><input type="checkbox" id="mod8-step5"> <span><strong>Listener Rules:</strong> Added a listener on Port 80 that forwards 100% of traffic to the Target Group.</span></label></li><li><label><input type="checkbox" id="mod8-step6"> <span><strong>Path-Based Routing:</strong> Explored adding listener rules to route traffic dynamically (e.g., routing `/students/*` to one target group and `/payments/*` to another).</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>When an ALB intercepts traffic, it obscures the client's original IP address. Backend code must extract the client IP from the `X-Forwarded-For` HTTP header injected by the load balancer.</em></p>
+            <pre><code class="typewriter"># Python/FastAPI implementation behind an ALB
+
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.get("/")
+def read_root(request: Request):
+    # Extract the original user IP injected by the ALB
+    client_ip = request.headers.get("x-forwarded-for")
+    
+    # Fallback if accessed directly (bypassing ALB)
+    if not client_ip:
+        client_ip = request.client.host
+        
+    return {"message": "Success", "client_ip": client_ip}</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: 502 Bad Gateway / Targets Unhealthy.</strong><br>If the ALB returns a 502 error, it cannot communicate with the backend EC2 instances. Go to Target Groups. If the instances are marked 'Unhealthy', the ALB health check ping is failing. Ensure the EC2 web service (Nginx/Apache) is running and the EC2 Security Group allows traffic from the ALB.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

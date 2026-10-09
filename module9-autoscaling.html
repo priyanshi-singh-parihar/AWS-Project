@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 09: Auto Scaling Groups | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Scaling</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 09: Auto Scaling Groups</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 60 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: ASG, Launch Templates, EC2</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>Auto Scaling Groups (ASG) provide dynamic capacity management. They automatically scale out (add instances) during traffic spikes and scale in (remove instances) when demand drops, optimizing both performance and cost. ASGs also enforce self-healing by replacing degraded instances automatically.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>We attached an ASG directly to our Application Load Balancer's Target Group. During university exam results day, when traffic spikes 500%, CloudWatch detects the high CPU usage and the ASG automatically provisions new web servers, registers them with the ALB, and handles the load seamlessly.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph TD
+    CW((CloudWatch Metrics)) -->|CPU > 60% Alarm| ASG[Auto Scaling Group]
+    
+    ASG -->|Triggers| LT[Launch Template]
+    
+    subgraph Provisioning
+        LT -->|Creates| NewEC2[New EC2 Instance]
+        NewEC2 -->|Runs| UserData[User Data Bootstrap Script]
+    end
+    
+    UserData -->|Registers with| ALB((Application Load Balancer))
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 9: Dynamic Scale-Out Infrastructure Flow</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>Auto Scaling Elasticity vs. Boot Latency: ASGs ensure your application never crashes under sudden traffic surges and saves money when idle. The trade-off is boot latency—new instances take 2-3 minutes to spin up, meaning sudden massive flash-crowd spikes can temporarily overwhelm existing servers before scaling completes.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod9-step0"> <span><strong>Launch Template Setup:</strong> Created a Launch Template defining the blueprint for new servers. Selected our custom AMI, the `t2.micro` instance type, and the private backend Security Group.</span></label></li><li><label><input type="checkbox" id="mod9-step1"> <span><strong>User Data Bootstrapping:</strong> Injected a robust Bash script into the template to `git pull` the latest application code, install dependencies, and start the systemd web service automatically on boot.</span></label></li><li><label><input type="checkbox" id="mod9-step2"> <span><strong>ASG Network Configuration:</strong> Created the ASG and mapped it to our VPC, selecting multiple Private Subnets to ensure new instances are balanced across Availability Zones.</span></label></li><li><label><input type="checkbox" id="mod9-step3"> <span><strong>Load Balancer Integration:</strong> Selected 'Attach to an existing load balancer' and picked our ALB Target Group. Toggled on 'ELB health checks' so the ASG terminates instances that fail application-level checks, not just EC2 hardware checks.</span></label></li><li><label><input type="checkbox" id="mod9-step4"> <span><strong>Capacity Limits:</strong> Set Minimum Capacity to 2, Desired Capacity to 2, and Maximum Capacity to 6.</span></label></li><li><label><input type="checkbox" id="mod9-step5"> <span><strong>Target Tracking Policy:</strong> Configured a dynamic scaling policy targeting an 'Average CPU Utilization' of 60%.</span></label></li><li><label><input type="checkbox" id="mod9-step6"> <span><strong>Cooldown Periods:</strong> Set a cooldown period of 300 seconds to prevent the ASG from launching too many instances while waiting for the first batch to finish booting.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>The User Data script in a Launch Template is absolutely critical. An auto-scaled instance must be 100% self-configuring on boot, requiring zero manual human SSH intervention.</em></p>
+            <pre><code class="typewriter">#!/bin/bash
+# High-fidelity User Data script for ASG instances
+apt-get update -y
+apt-get install -y nginx git python3-pip
+
+# Clone application code
+git clone https://github.com/itm-project/backend.git /var/www/html/app
+cd /var/www/html/app
+
+# Install dependencies and restart service
+pip3 install -r requirements.txt
+systemctl restart nginx</code></pre>
+        </section>
+
+        
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: Instances are constantly terminating and relaunching (Flapping).</strong><br>If instances are stuck in a create/terminate loop, your ELB health check is failing. The ASG launches the instance, the ALB pings `/health`, but because your User Data script hasn't finished running yet (or failed entirely), the ALB marks it Unhealthy and the ASG kills it. Increase the Health Check Grace Period.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>

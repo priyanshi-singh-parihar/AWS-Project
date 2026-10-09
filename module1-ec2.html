@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 01: Amazon EC2 | AWS Training</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">☁️ AWS Labs</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html" class="nav-item">Home</a></li>
+                <li><a href="linux.html" class="nav-item">🐧 Linux Guide</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn nav-item">Modules ▾</a>
+                    <div class="dropdown-content">
+                        <a href="module1-ec2.html">01. EC2</a>
+                        <a href="module2-s3.html">02. S3</a>
+                        <a href="module3-vpc.html">03. VPC</a>
+                        <a href="module4-iam.html">04. IAM</a>
+                        <a href="module5-rds.html">05. RDS</a>
+                        <a href="module6-lambda.html">06. Lambda</a>
+                        <a href="module7-route53.html">07. Route 53</a>
+                        <a href="module8-elb.html">08. ELB</a>
+                        <a href="module9-autoscaling.html">09. Auto Scaling</a>
+                        <a href="module10-cloudwatch.html">10. CloudWatch</a>
+                    </div>
+                </li>
+                <li><a href="index.html#team" class="nav-item">Team</a></li>
+                <li><button id="theme-toggle" class="theme-btn" title="Toggle Dark Mode">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 40px;">
+            <span class="module-tag" style="margin-bottom: 20px;">Compute</span>
+            <h1 style="color: var(--border-dark); font-size: 2.5rem; text-transform: uppercase; line-height: 1.1;">Module 01: Amazon EC2</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600;">
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⏱️ Est. Time: 45 Mins</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">⚙️ Services: EC2, EBS, VPC</span>
+                <span style="background: var(--card-bg); border: 2px solid var(--border-dark); padding: 5px 10px; border-radius: 4px; color: var(--border-dark);">💰 Cost: Free Tier Eligible</span>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h3>Core Concept & Real-World Utility</h3>
+            <p>EC2 is the foundational compute unit of AWS. It provides resizable, on-demand virtual machines (instances). In enterprise architectures, EC2 handles everything from hosting stateless microservices and backend APIs to running heavy data-processing algorithms.</p>
+        </section>
+
+        <section class="content-section">
+            <h3>Architecture Integration</h3>
+            <p>In our campus portal project, the EC2 instance acts as the primary web application server. It resides inside a public subnet (to receive HTTP requests directly, prior to adding an ALB) and executes a Python/FastAPI backend configured behind an Nginx reverse proxy.</p>
+            
+            <div class="brutal-image-container">
+                <div class="mermaid-wrapper">
+                    <pre class="mermaid">
+
+graph LR
+    User((Client Browser)) -->|HTTP: Port 80| IGW[Internet Gateway]
+    IGW --> VPC
+    
+    subgraph VPC [itm-production-vpc]
+        subgraph PublicSubnet [Public Subnet]
+            EC2[Ubuntu EC2 Instance]
+            Nginx[Nginx Reverse Proxy]
+            App[FastAPI Backend]
+            EC2 --- Nginx
+            Nginx --> App
+        end
+    end
+    
+    Dev((Developer)) -->|SSH: Port 22| EC2
+    EC2 -->|Root Vol| EBS[(EBS gp3 Volume)]
+    
+                    </pre>
+                </div>
+                <div class="image-caption">Fig 1: EC2 Compute Architecture and Port Access</div>
+            </div>
+        </section>
+
+        <div class="tradeoff-box">
+            <h4 style="color: #15803d;">⚖️ Architecture Trade-off Analysis</h4>
+            <p>EC2 vs. Serverless Compute (Lambda): Choosing a persistent EC2 instance guarantees zero cold-start latency and full root shell access for custom database connection pooling. However, unlike serverless options that scale to zero cost when idle, EC2 incurs continuous hourly charges 24/7 and requires manual OS security patching.</p>
+        </div>
+
+        <section class="content-section">
+            <h3>Interactive Lab Execution Steps</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">* Your progress is automatically saved to local storage.</p>
+            <ul class="checklist">
+                <li><label><input type="checkbox" id="mod1-step0"> <span><strong>AMI Selection:</strong> Navigated to the EC2 Dashboard and chose the 'Ubuntu Server 22.04 LTS (HVM)' Amazon Machine Image (AMI). We selected Ubuntu for its vast apt-package repository and stability in production environments.</span></label></li><li><label><input type="checkbox" id="mod1-step1"> <span><strong>Instance Type:</strong> Selected the 't2.micro' instance family (1 vCPU, 1 GiB Memory). This balances sufficient compute for our Python app while staying fully compliant with the 750-hour/month AWS Free Tier limit.</span></label></li><li><label><input type="checkbox" id="mod1-step2"> <span><strong>Key Pair Generation:</strong> Generated a new RSA Key Pair named `itm-lab-key.pem`. This PEM file utilizes public-key cryptography to grant secure shell (SSH) access, replacing vulnerable password-based logins.</span></label></li><li><label><input type="checkbox" id="mod1-step3"> <span><strong>Security Group Configuration:</strong> Configured stateful inbound firewall rules. Opened Port 22 (SSH) strictly to 'My IP' to prevent brute-force attacks, and Port 80 (HTTP) to '0.0.0.0/0' to serve web traffic.</span></label></li><li><label><input type="checkbox" id="mod1-step4"> <span><strong>EBS Volume Tuning:</strong> Configured the Elastic Block Store (EBS) root volume. Switched from standard gp2 to `gp3` (General Purpose SSD) to get a baseline of 3,000 IOPS and 125 MB/s throughput regardless of volume size.</span></label></li><li><label><input type="checkbox" id="mod1-step5"> <span><strong>User Data Scripting:</strong> In the advanced details, injected a Bash User Data script to automatically run `apt-get update` and install Nginx during the initial boot sequence (Bootstrap).</span></label></li><li><label><input type="checkbox" id="mod1-step6"> <span><strong>Elastic IPs:</strong> Allocated an Elastic IP address and associated it with the instance so the public IPv4 address wouldn't change upon instance stop/start.</span></label></li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h3>Terminal / Code Execution</h3>
+            <p><em>Connecting to the EC2 instance via the terminal requires adjusting the key permissions first to prevent 'Unprotected Private Key File' errors thrown by the SSH client.</em></p>
+            <pre><code class="typewriter"># Step 1: Restrict permissions on the downloaded key file
+chmod 400 itm-lab-key.pem
+
+# Step 2: SSH into the public DNS of the EC2 instance
+ssh -i "itm-lab-key.pem" ubuntu@ec2-198-51-100-1.compute-1.amazonaws.com
+
+# Step 3: Verify the Nginx installation from our User Data script
+systemctl status nginx</code></pre>
+        </section>
+
+        
+        <div class="practical-box" style="border-color: #ef4444; background-color: #fef2f2;">
+            <h4 style="color: #b91c1c;">⚠️ AWS Free Tier Cost Warning</h4>
+            <p style="color: #b91c1c;">Always ensure you select resources marked "Free tier eligible". Leaving non-eligible resources running (like NAT Gateways, Elastic IPs not attached to running instances, or t3.large instances) will result in immediate hourly billing to your AWS account. Terminate instances when the lab is complete.</p>
+        </div>
+
+        <div class="gotcha-box">
+            <h4>Debugging & Troubleshooting</h4>
+            <p><strong>Error: Connection Refused / Timeout on Port 80.</strong><br>If the terminal SSH works but the browser cannot load the website, the issue is the Security Group. Verify that an Inbound Rule explicitly allows TCP Port 80 from <code>0.0.0.0/0</code>. EC2 instances block all inbound traffic implicitly by default.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Built by Priyanshi Singh Parihar & Mudita Jain • ITM Gwalior • B.Tech CSE (5th Sem)</p>
+    </footer>
+    <script src="script.js"></script>
+
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+        startOnLoad: true, 
+        theme: 'base',
+        themeVariables: {
+            fontFamily: 'JetBrains Mono',
+            primaryColor: '#ffffff',
+            primaryBorderColor: '#111111',
+            lineColor: '#111111',
+            textColor: '#111111',
+            tertiaryColor: '#e0f2fe'
+        }
+      });
+    </script>
+    
+</body>
+</html>
